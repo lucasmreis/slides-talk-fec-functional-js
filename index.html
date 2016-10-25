@@ -1,0 +1,963 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Programação Funcional e Javascript</title>
+    <meta name="description" content="Diminuindo a Dor de Cabeça no Frontend">
+    <meta name="author" content="Lucas Reis">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="//code.jquery.com/jquery-1.8.0.js"></script>
+    <script src="//code.jquery.com/ui/1.8.23/jquery-ui.js"></script>
+    <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/night.css" id="theme">
+    <link type="text/css" rel="stylesheet" href="fsharp.formatting/styles/style.css" />
+    <link type="text/css" rel="stylesheet" href="fsharp.formatting/styles/deedle.css" />
+    <link type="text/css" rel="stylesheet" href="css/custom.css" />
+    <script src="fsharp.formatting/styles/tips.js" type="text/javascript"></script>
+    <!-- For syntax highlighting -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+    <link rel="stylesheet" href="css/fsreveal.css">
+    <!-- If the query includes 'print-pdf', include the PDF print sheet -->
+    <script>
+			if( window.location.search.match( /print-pdf/gi ) ) {
+				var link = document.createElement( 'link' );
+				link.rel = 'stylesheet';
+				link.type = 'text/css';
+				link.href = 'css/print/pdf.css';
+				document.getElementsByTagName( 'head' )[0].appendChild( link );
+			}
+    </script>
+    <!--[if lt IE 9]>
+    <script src="lib/js/html5shiv.js"></script>
+    <![endif]-->
+    <script language="javascript" type="text/javascript">
+        function init()
+        {
+            websocket = new WebSocket("ws://"+window.location.host+"/websocket");
+            websocket.onmessage = function(evt) { location.reload(); };
+        }
+        window.addEventListener("load", init, false);
+    </script>
+</head>
+<body>
+    <div class="reveal">
+        
+        <!-- Any section element inside of this container is displayed as a slide -->
+        <div class="slides">
+            <section data-background="linear-gradient(to bottom right, #FF5E3A, #FF2A68)">
+<h3>Functional Javascript:</h3>
+<h2>Diminuindo a Dor de Cabeça no Frontend</h2>
+<h4>Lucas Reis</h4>
+<p>@iamlucasreis</p>
+</section>
+<section >
+<h3>Quem sou eu?</h3>
+<ul>
+<li>Líder do time de Frontend do Checkout das marcas <strong>Americanas, Submarino, Shoptime e Soubarato</strong></li>
+<li>Time composto por 5 desenvolvedores + 1 Product Owner + 1 part-time Quality Assurance</li>
+<li>3 projetos <em>white label</em>: Checkout + Login + Finance</li>
+<li>ES5, Babel, Angular, React, Grunt, Gulp, Brunch...</li>
+<li>+ ou - 100 mil linhas de javascript</li>
+</ul>
+</section>
+<section >
+<h3>O que você pensa quando pensa em 100 mil linhas de javascript?</h3>
+</section>
+<section >
+<img src="images/thisisfine.png" alt="This Is Fine" style="width: 800px;"/>
+</section>
+<section data-background="linear-gradient(to bottom right, #1D77EF, #81F3FD)">
+<p>Quais os problemas?</p>
+<h2>Confiabilidade + Segurança</h2>
+</section>
+<section >
+<h2>Confiabilidade</h2>
+<p>Meu código faz o que eu quero que ele faça</p>
+</section>
+<section >
+<h2>Segurança</h2>
+<p>Ausência de acidentes que causam prejuízos inesperados e inaceitáveis</p>
+</section>
+<section data-background="linear-gradient(to bottom right, #FF5E3A, #FF2A68)">
+<p>Vamos começar a atacar esses problemas num dos níveis mais fundamentais da programação:</p>
+<h2>Function Design</h2>
+</section>
+<section >
+<h2>Existem apenas dois tipos de inputs e outputs para qualquer função</h2>
+</section>
+<section >
+<p>Primeiro tipo:</p>
+<h2>Convencionais</h2>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="k">const</span> sum <span class="o">=</span> (n, m) <span class="o">=</span><span class="o">&gt;</span> n <span class="o">+</span> m
+</code></pre></td></tr></table>
+<p>Os parâmetros são o <em>input</em> e o retorno é o <em>output</em> da função.</p>
+<p>E só.</p>
+</section>
+<section >
+<p>Segundo tipo:</p>
+<h2>Escondidos</h2>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="k">function</span> processNext() {
+  let msg <span class="o">=</span> InboxQueue.getNext()
+
+  transformMessage(msg);
+
+  let response;
+
+  <span class="k">if</span> (msg.type <span class="o">=</span><span class="o">=</span><span class="o">=</span> <span class="s">'TYPE_A'</span>) {
+    response <span class="o">=</span> axios(url, { <span class="k">params</span>: msg })
+  } <span class="k">else</span> {
+    let <span class="k">params</span> <span class="o">=</span> { some: <span class="s">'parameter'</span> }
+    response <span class="o">=</span> axios(url, { <span class="k">params</span> })
+  }
+
+  response.then(() <span class="o">=</span><span class="o">&gt;</span> processed <span class="o">=</span> <span class="k">true</span>)
+}
+</code></pre></td></tr></table>
+</section>
+<section >
+<p>Problemas de um código com muitos inputs e outputs escondidos:</p>
+<h2>Difícil de entender</h2>
+<h2>Difícil de testar</h2>
+</section>
+<section >
+<img src="images/hidden.gif" alt="Fear Of Hidden" style="width: 800px;"/>
+<p>Ou seja, medo.</p>
+</section>
+<section data-background="linear-gradient(to bottom right, #1D77EF, #81F3FD)">
+<h3>Vamos refatorar!</h3>
+</section>
+<section >
+<section >
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="c">// ...</span>
+let msg <span class="o">=</span> InboxQueue.getNext()
+<span class="c">// ...</span>
+</code></pre></td></tr></table>
+<p>:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="k">const</span> getNext <span class="o">=</span> queue <span class="o">=</span><span class="o">&gt;</span> queue.getNext()
+</code></pre></td></tr></table>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+<span class="l">7: </span>
+<span class="l">8: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="c">// simple test:</span>
+it('should pop from queue', () <span class="o">=</span><span class="o">&gt;</span> {
+  <span class="k">const</span> fakeQueue <span class="o">=</span> { getNext: () <span class="o">=</span><span class="o">&gt;</span> <span class="s">'something'</span> }
+
+  <span class="k">const</span> result <span class="o">=</span> getNext(fakeQueue)
+
+  assert.equal(result, <span class="s">'something'</span>)
+})
+</code></pre></td></tr></table>
+<p><em>"pratos limpos"</em></p>
+</section>
+<section >
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="k">function</span> processNext() {
+  let msg <span class="o">=</span> InboxQueue.getNext()
+
+  transformMessage(msg);
+
+  let response;
+
+  <span class="k">if</span> (msg.type <span class="o">=</span><span class="o">=</span><span class="o">=</span> <span class="s">'TYPE_A'</span>) {
+    response <span class="o">=</span> axios(url, { <span class="k">params</span>: msg })
+  } <span class="k">else</span> {
+    let <span class="k">params</span> <span class="o">=</span> { some: <span class="s">'parameter'</span> }
+    response <span class="o">=</span> axios(url, { <span class="k">params</span> })
+  }
+
+  response.then(() <span class="o">=</span><span class="o">&gt;</span> processed <span class="o">=</span> <span class="k">true</span>)
+}
+</code></pre></td></tr></table>
+</section>
+</section>
+<section >
+<section >
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="c">// ...</span>
+transformMessage(msg);
+<span class="c">// ...</span>
+</code></pre></td></tr></table>
+<p>:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="k">const</span> pureTransform <span class="o">=</span> msg <span class="o">=</span><span class="o">&gt;</span> {
+  let newMsg <span class="o">=</span> { ...msg }
+  transformMessage(newMsg);
+  <span class="k">return</span> newMsg
+}
+</code></pre></td></tr></table>
+<p>"<em>se uma árvore cai na floresta...</em>"</p>
+</section>
+<section >
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="k">function</span> processNext() {
+  let msg <span class="o">=</span> InboxQueue.getNext()
+
+  transformMessage(msg);
+
+  let response;
+
+  <span class="k">if</span> (msg.type <span class="o">=</span><span class="o">=</span><span class="o">=</span> <span class="s">'TYPE_A'</span>) {
+    response <span class="o">=</span> axios(url, { <span class="k">params</span>: msg })
+  } <span class="k">else</span> {
+    let <span class="k">params</span> <span class="o">=</span> { some: <span class="s">'parameter'</span> }
+    response <span class="o">=</span> axios(url, { <span class="k">params</span> })
+  }
+
+  response.then(() <span class="o">=</span><span class="o">&gt;</span> processed <span class="o">=</span> <span class="k">true</span>)
+}
+</code></pre></td></tr></table>
+</section>
+</section>
+<section >
+<section >
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="c">// ...</span>
+let response;
+
+<span class="k">if</span> (msg.type <span class="o">=</span><span class="o">=</span><span class="o">=</span> <span class="s">'TYPE_A'</span>) {
+  response <span class="o">=</span> axios(url, { <span class="k">params</span>: msg })
+} <span class="k">else</span> {
+  let <span class="k">params</span> <span class="o">=</span> { some: <span class="s">'parameter'</span> }
+  response <span class="o">=</span> axios(url, { <span class="k">params</span> })
+}
+<span class="c">// ...</span>
+</code></pre></td></tr></table>
+<p>:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="k">const</span> buildParams <span class="o">=</span> msg <span class="o">=</span><span class="o">&gt;</span> msg.type <span class="o">=</span><span class="o">=</span><span class="o">=</span> <span class="s">'TYPE_A'</span>
+  ? { <span class="k">params</span>: msg}
+  : { <span class="k">params</span>: { some: <span class="s">'parameter'</span> } }
+</code></pre></td></tr></table>
+<p><em>"joga no simples</em>"</p>
+</section>
+<section >
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="k">function</span> processNext() {
+  let msg <span class="o">=</span> InboxQueue.getNext()
+
+  transformMessage(msg);
+
+  let response;
+
+  <span class="k">if</span> (msg.type <span class="o">=</span><span class="o">=</span><span class="o">=</span> <span class="s">'TYPE_A'</span>) {
+    response <span class="o">=</span> axios(url, { <span class="k">params</span>: msg })
+  } <span class="k">else</span> {
+    let <span class="k">params</span> <span class="o">=</span> { some: <span class="s">'parameter'</span> }
+    response <span class="o">=</span> axios(url, { <span class="k">params</span> })
+  }
+
+  response.then(() <span class="o">=</span><span class="o">&gt;</span> processed <span class="o">=</span> <span class="k">true</span>)
+}
+</code></pre></td></tr></table>
+</section>
+</section>
+<section >
+<section >
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="k">const</span> apiRequest <span class="o">=</span> (requestFn, url) <span class="o">=</span><span class="o">&gt;</span>
+  <span class="k">params</span> <span class="o">=</span><span class="o">&gt;</span> requestFn(url, <span class="k">params</span>)
+</code></pre></td></tr></table>
+<p><em>"me engana que eu gosto"</em></p>
+</section>
+<section >
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="k">function</span> processNext() {
+  let msg <span class="o">=</span> InboxQueue.getNext()
+
+  transformMessage(msg);
+
+  let response;
+
+  <span class="k">if</span> (msg.type <span class="o">=</span><span class="o">=</span><span class="o">=</span> <span class="s">'TYPE_A'</span>) {
+    response <span class="o">=</span> axios(url, { <span class="k">params</span>: msg })
+  } <span class="k">else</span> {
+    let <span class="k">params</span> <span class="o">=</span> { some: <span class="s">'parameter'</span> }
+    response <span class="o">=</span> axios(url, { <span class="k">params</span> })
+  }
+
+  response.then(() <span class="o">=</span><span class="o">&gt;</span> processed <span class="o">=</span> <span class="k">true</span>)
+}
+</code></pre></td></tr></table>
+</section>
+</section>
+<section >
+<section >
+<p>Facilmente conseguimos fazer injeção de dependências:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="c">// no código da aplicação:</span>
+<span class="k">const</span> getItems <span class="o">=</span> apiRequest(axios, <span class="s">'http://my-url.com'</span>)
+<span class="k">const</span> items <span class="o">=</span> getItems({ tag: <span class="s">'some-tag'</span> })
+</code></pre></td></tr></table>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="c">// no código de teste:</span>
+<span class="k">const</span> fakeAxios <span class="o">=</span> (url, <span class="k">params</span>) <span class="o">=</span><span class="o">&gt;</span> {
+  assert.ok(url <span class="o">=</span><span class="o">=</span><span class="o">=</span> <span class="s">'http://my-url.com'</span>)
+  assert.ok(<span class="k">params</span>.tag <span class="o">=</span><span class="o">=</span><span class="o">=</span> <span class="s">'some-tag'</span>)
+  <span class="k">return</span> Promise.resolve({ status: <span class="n">200</span> })
+}
+
+<span class="k">const</span> getItems <span class="o">=</span> apiRequest(fakeAxios, <span class="s">'http://my-url.com'</span>)
+<span class="k">const</span> items <span class="o">=</span> getItems({ tag: <span class="s">'some-tag'</span> })
+item.then(res <span class="o">=</span><span class="o">&gt;</span> assert.ok(res.status <span class="o">=</span><span class="o">=</span><span class="o">=</span> <span class="n">200</span>))
+</code></pre></td></tr></table>
+</section>
+<section >
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="k">function</span> processNext() {
+  let msg <span class="o">=</span> InboxQueue.getNext()
+
+  transformMessage(msg);
+
+  let response;
+
+  <span class="k">if</span> (msg.type <span class="o">=</span><span class="o">=</span><span class="o">=</span> <span class="s">'TYPE_A'</span>) {
+    response <span class="o">=</span> axios(url, { <span class="k">params</span>: msg })
+  } <span class="k">else</span> {
+    let <span class="k">params</span> <span class="o">=</span> { some: <span class="s">'parameter'</span> }
+    response <span class="o">=</span> axios(url, { <span class="k">params</span> })
+  }
+
+  response.then(() <span class="o">=</span><span class="o">&gt;</span> processed <span class="o">=</span> <span class="k">true</span>)
+}
+</code></pre></td></tr></table>
+</section>
+</section>
+<section >
+<section >
+<h3>Versão final mais simples!</h3>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+<span class="l">7: </span>
+<span class="l">8: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="k">const</span> processNext <span class="o">=</span> (requestFn, url) <span class="o">=</span><span class="o">&gt;</span>
+  queue <span class="o">=</span><span class="o">&gt;</span> {
+    <span class="k">const</span> msg <span class="o">=</span> getNext(queue)
+    <span class="k">const</span> transformed <span class="o">=</span> pureTransformMessage(msg)
+    <span class="k">const</span> pars <span class="o">=</span> buildParams(transformed)
+    <span class="k">const</span> response <span class="o">=</span> apiRequest(requestFn, url)(pars)
+    <span class="k">return</span> response.then(() <span class="o">=</span><span class="o">&gt;</span> <span class="k">true</span>)
+  }
+</code></pre></td></tr></table>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="k">const</span> productionProcessNext <span class="o">=</span>
+  processNext(axios, <span class="s">'http://my-url.com'</span>)
+
+processed <span class="o">=</span> productionProcessNext(InboxQueue)
+</code></pre></td></tr></table>
+</section>
+<section >
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="k">function</span> processNext() {
+  let msg <span class="o">=</span> InboxQueue.getNext()
+
+  transformMessage(msg);
+
+  let response;
+
+  <span class="k">if</span> (msg.type <span class="o">=</span><span class="o">=</span><span class="o">=</span> <span class="s">'TYPE_A'</span>) {
+    response <span class="o">=</span> axios(url, { <span class="k">params</span>: msg })
+  } <span class="k">else</span> {
+    let <span class="k">params</span> <span class="o">=</span> { some: <span class="s">'parameter'</span> }
+    response <span class="o">=</span> axios(url, { <span class="k">params</span> })
+  }
+
+  response.then(() <span class="o">=</span><span class="o">&gt;</span> processed <span class="o">=</span> <span class="k">true</span>)
+}
+</code></pre></td></tr></table>
+</section>
+</section>
+<section >
+<h3>Alternativa: composição de funções</h3>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="k">const</span> then <span class="o">=</span> fn <span class="o">=</span><span class="o">&gt;</span> promise <span class="o">=</span><span class="o">&gt;</span> promise.then(fn)
+
+<span class="k">const</span> always <span class="o">=</span> x <span class="o">=</span><span class="o">&gt;</span> () <span class="o">=</span><span class="o">&gt;</span> x
+</code></pre></td></tr></table>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+<span class="l">7: </span>
+<span class="l">8: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="k">const</span> processNext <span class="o">=</span> (requestFn, url) <span class="o">=</span><span class="o">&gt;</span>
+  queue <span class="o">=</span><span class="o">&gt;</span> compose(
+    then(always(<span class="k">true</span>))
+    apiRequest(requestFn, url),
+    buildParams,
+    pureTransformMessage,
+    getNext
+  )(queue)
+</code></pre></td></tr></table>
+</section>
+<section >
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js">it('should work!', <span class="k">function</span> () {
+
+  <span class="k">const</span> requestFn <span class="o">=</span> (requestFn, url) <span class="o">=</span><span class="o">&gt;</span>
+    <span class="k">params</span> <span class="o">=</span><span class="o">&gt;</span> Promise.resolve({ status: <span class="n">200</span> })
+
+  <span class="k">const</span> queue <span class="o">=</span>
+    { getNext: () <span class="o">=</span><span class="o">&gt;</span> { some: <span class="s">'message'</span> } }
+
+  <span class="k">const</span> processNextFn <span class="o">=</span>
+    processNext(requestFn, <span class="s">'http://my-url.com'</span>)
+
+  assert.ok(processNextFn(queue))
+})
+</code></pre></td></tr></table>
+</section>
+<section >
+<p><img src="images/happy.gif" alt="Happy" /></p>
+<p>Felicidade!</p>
+</section>
+<section data-background="linear-gradient(to bottom right, #FF5E3A, #FF2A68)">
+<p>Mais um benefício:</p>
+<h3>Funções feitas dessa maneira evoluem mais facilmente</h3>
+</section>
+<section >
+<p><em>Precisamos saber se os customers têm o mesmo nome</em></p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="k">const</span> hasSameName <span class="o">=</span> (customerA, customerB) <span class="o">=</span><span class="o">&gt;</span>
+  customerA.name <span class="o">=</span><span class="o">=</span><span class="o">=</span> customerB.name
+</code></pre></td></tr></table>
+</section>
+<section >
+<p><em>Precisamos saber também se os customers também têm o mesmo telefone</em></p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="k">const</span> hasSameName <span class="o">=</span> (customerA, customerB) <span class="o">=</span><span class="o">&gt;</span>
+  customerA.name <span class="o">=</span><span class="o">=</span><span class="o">=</span> customerB.name
+
+<span class="k">const</span> hasSamePhone <span class="o">=</span> (customerA, customerB) <span class="o">=</span><span class="o">&gt;</span>
+  customerA.phone <span class="o">=</span><span class="o">=</span><span class="o">=</span> customerB.phone
+</code></pre></td></tr></table>
+</section>
+<section >
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+<span class="l">7: </span>
+<span class="l">8: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="k">const</span> hasSameProp <span class="o">=</span> (property, customerA, customerB) <span class="o">=</span><span class="o">&gt;</span>
+  customerA[property] <span class="o">=</span><span class="o">=</span><span class="o">=</span> customerB[property]
+
+<span class="k">const</span> hasSameName <span class="o">=</span> (customerA, customerB) <span class="o">=</span><span class="o">&gt;</span>
+  hasSameProp(<span class="s">'name'</span>, customerA, customerB)
+
+<span class="k">const</span> hasSamePhone <span class="o">=</span> (customerA, customerB) <span class="o">=</span><span class="o">&gt;</span>
+  hasSameProp(<span class="s">'phone'</span>, customerA, customerB)
+</code></pre></td></tr></table>
+</section>
+<section >
+<p>Podemos melhorar <strong>hasSameProp</strong>:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+<span class="l">7: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="k">const</span> prop <span class="o">=</span> (property, obj) <span class="o">=</span><span class="o">&gt;</span>
+  <span class="k">typeof</span> obj <span class="o">=</span><span class="o">=</span><span class="o">=</span> <span class="s">'object'</span>
+    ? obj[property]
+    : undefined
+
+<span class="k">const</span> hasSameProp <span class="o">=</span> (property, customerA, customerB) <span class="o">=</span><span class="o">&gt;</span>
+  prop(property, customerA) <span class="o">=</span><span class="o">=</span><span class="o">=</span> prop(property, customerB)
+</code></pre></td></tr></table>
+<p>Mais segurança!</p>
+</section>
+<section >
+<p><strong>Curry</strong> torna o código mais conciso:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+<span class="l">7: </span>
+<span class="l">8: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js">import curry from <span class="s">'curry'</span>
+
+<span class="k">const</span> hasSameProp <span class="o">=</span> curry((property, customerA, customerB) <span class="o">=</span><span class="o">&gt;</span>
+  prop(property, customerA) <span class="o">=</span><span class="o">=</span><span class="o">=</span> prop(property, customerB))
+
+<span class="k">const</span> hasSameName <span class="o">=</span> hasSameProp(<span class="s">'name'</span>)
+
+<span class="k">const</span> hasSamePhone <span class="o">=</span> hasSameProp(<span class="s">'phone'</span>)
+</code></pre></td></tr></table>
+</section>
+<section >
+<p><em>Também precisamos saber se tem os mesmos endereços...</em></p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js">import curry from <span class="s">'curry'</span>
+import deepEqual from <span class="s">'deep-equal'</span>
+
+<span class="k">const</span> shallowEqual <span class="o">=</span> (x, y) <span class="o">=</span><span class="o">&gt;</span> x <span class="o">=</span><span class="o">=</span><span class="o">=</span> y
+
+<span class="k">const</span> hasSameProp <span class="o">=</span> curry((eqFn, property, customerA, customerB) <span class="o">=</span><span class="o">&gt;</span> {
+  <span class="k">const</span> propA <span class="o">=</span> prop(property, customerA)
+  <span class="k">const</span> propB <span class="o">=</span> prop(property, customerB)
+  <span class="k">return</span> eqFn(propA, propB)
+}
+
+<span class="k">const</span> hasSameName <span class="o">=</span> hasSameProp(shallowEqual, <span class="s">'name'</span>)
+
+<span class="k">const</span> hasSamePhone <span class="o">=</span> hasSameProp(shallowEqual, <span class="s">'phone'</span>)
+
+<span class="k">const</span> hasSameAddresses <span class="o">=</span> hasSameProp(deepEqual, <span class="s">'addresses'</span>)
+</code></pre></td></tr></table>
+</section>
+<section >
+<p><em>...e também se eles gastaram a mesma quantidade em compras...?</em> (1/2)</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="k">const</span> totalSpent <span class="o">=</span> customer <span class="o">=</span><span class="o">&gt;</span> compose(
+  sum,
+  map(prop(<span class="s">'total'</span>)),
+  propOr([], <span class="s">'orders'</span>)
+)(customer)
+
+<span class="k">const</span> hasSameValues <span class="o">=</span> curry((eqFn, customerFn, customerA, customerB) <span class="o">=</span><span class="o">&gt;</span> {
+  <span class="k">const</span> valueA <span class="o">=</span> customerFn(customerA)
+  <span class="k">const</span> valueB <span class="o">=</span> customerFn(customerB)
+  <span class="k">return</span> eqFn(valueA, valueB)
+}
+</code></pre></td></tr></table>
+</section>
+<section >
+<p><em>...e também se eles gastaram a mesma quantidade em compras...?</em> (2/2)</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="k">const</span> hasSameName <span class="o">=</span>
+  hasSameValues(shallowEqual, prop(<span class="s">'name'</span>))
+
+<span class="k">const</span> hasSamePhone <span class="o">=</span>
+  hasSameValues(shallowEqual, prop(<span class="s">'phone'</span>))
+
+<span class="k">const</span> hasSameAddresses <span class="o">=</span>
+  hasSameValues(deepEqual, prop(<span class="s">'addresses'</span>))
+
+<span class="k">const</span> hasSameTotal <span class="o">=</span>
+  hasSameValues(shallowEqual, totalSpent)
+</code></pre></td></tr></table>
+</section>
+<section data-background="linear-gradient(to bottom right, #1D77EF, #81F3FD)">
+<p>Conclusão:</p>
+<h2>Programação funcional torna sua vida mais simples!</h2>
+</section>
+<section >
+<img src="images/simple.gif" alt="Simple" style="width: 800px;"/>
+</section>
+<section >
+<p>Eu quero me beneficar das vantagens da programação funcional!</p>
+<h3>Ótimo!</h3>
+</section>
+<section >
+<p>Procure as libs:</p>
+<h2>RamdaJS</h2>
+<h2>LodashFP</h2>
+<p>Muitas funções genéricas já prontas!</p>
+</section>
+<section >
+<h3>Procure frameworks que se harmonizam e estimulam um estilo funcional de código</h3>
+</section>
+<section data-background="linear-gradient(to bottom right, #FF5E3A, #FF2A68)">
+<p>Continuando no mundo Javascript:</p>
+<h3>Redux</h3>
+<ul>
+<li>Um objeto como estado da aplicação</li>
+<li>Interações do usuário disparam <em>actions</em></li>
+<li>Uma função pura chamada <em>reducer</em> recebe a action e o estado anterior e gera um novo estado</li>
+<li>Tem um ecossistema gigante, está virando o novo padrão</li>
+</ul>
+</section>
+<section >
+<h3>Redux</h3>
+<p><img src="images/liono.jpg" alt="Lion O" /></p>
+</section>
+<section data-background="linear-gradient(to bottom right, #1D77EF, #81F3FD)">
+<p>Continuando no mundo Javascript:</p>
+<h3>CycleJS</h3>
+<ul>
+<li>Utiliza RxJS como base</li>
+<li>Interações do usuário são um <em>stream</em> de dados</li>
+<li>A UI é uma função pura desses streams</li>
+<li>O RxJS é um paradigma extremamente poderoso, que facilita trabalhar com concorrência, e é portado para várias linguagens</li>
+</ul>
+</section>
+<section >
+<h3>CycleJS</h3>
+<p><img src="images/tygra.jpg" alt="Tygra" /></p>
+</section>
+<section data-background="linear-gradient(to bottom right, #FF5E3A, #FF2A68)">
+<p>Saindo do mundo Javascript...</p>
+<h3>ClojureScript</h3>
+<ul>
+<li>Linguagem super simples, fácil de entender</li>
+<li>Imutabilidade por default</li>
+<li>Macros dão uma flexibilidade para a linguagem, que permanece evoluindo</li>
+<li>Possui boa parte dos frameworks que influenciaram o mundo Javascript hoje: Om, Reagent e Quiescent</li>
+</ul>
+</section>
+<section >
+<h3>ClojureScript</h3>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip"><code lang="cljs">(def process-next [request-fn url queue]
+  (-&gt; queue
+      get-next
+      pureTransformMessage
+      build-params
+      (api-request request-fn url))
+</code></pre></td></tr></table>
+</section>
+<section >
+<h3>ClojureScript</h3>
+<p><img src="images/cheetara.jpg" alt="Cheetara" /></p>
+</section>
+<section data-background="linear-gradient(to bottom right, #1D77EF, #81F3FD)">
+<p>Saindo do mundo Javascript...</p>
+<h3>Elm</h3>
+<ul>
+<li>Toda função é pura, sempre. Nem adianta tentar</li>
+<li>Compilação muito poderosa, ajuda muito o desenvolvedor - <em>não há erros em runtime!!!</em></li>
+<li>É uma linguagem <em>e</em> um framework, que também influenciou o mundo Javascript de hoje</li>
+</ul>
+</section>
+<section >
+<h3>Elm</h3>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip"><code lang="elm">processNext requestFn url queue =
+  queue
+    |&gt; getNext
+    |&gt; pureTransformMessage
+    |&gt; buildParams
+    |&gt; apiRequest requestFn url
+</code></pre></td></tr></table>
+</section>
+<section >
+<h3>Elm</h3>
+<p><img src="images/panthro.jpg" alt="Panthro" /></p>
+</section>
+<section >
+<p>Ok, mas eu quero continuar trabalhando com orientação a objetos e acho que programação funcional é só modinha hipster!</p>
+</section>
+<section >
+<h3>Orientação a objetos</h3>
+<p><img src="images/snarf.jpg" alt="Snarf" /></p>
+<p><strong>;)</strong></p>
+</section>
+<section >
+<h3>Muito obrigado!</h3>
+<p>lucas.reis@b2wdigital.com</p>
+<p>@iamlucasmreis</p>
+<p><a href="http://lucasmreis.github.io/blog/">http://lucasmreis.github.io/blog/</a></p>
+<p><a href="https://github.com/lucasmreis">https://github.com/lucasmreis</a></p>
+</section>
+<section >
+<img src="images/trabalhe-conosco.png" alt="Trabalhe Conosco" style="width: 800px;"/>
+</section>
+<section >
+<p>Referências</p>
+<ul>
+<li>Confiabilidade + Segurança: <strong>Nancy Leveson</strong> - <a href="https://mitpress.mit.edu/books/engineering-safer-world">https://mitpress.mit.edu/books/engineering-safer-world</a></li>
+<li>Dois tipos de inputs e outputs: <strong>Kris Jenkins</strong> - <a href="http://blog.jenkster.com/2015/12/what-is-functional-programming.html">http://blog.jenkster.com/2015/12/what-is-functional-programming.html</a></li>
+<li>Difícil de entender, difícil de testar: <strong>Ben Moseley + Peter Marks</strong> - <a href="http://shaffner.us/cs/papers/tarpit.pdf">http://shaffner.us/cs/papers/tarpit.pdf</a></li>
+<li>Isolar side-effects: <strong>Brian Lonsdorf + Joe Nelson</strong> - <a href="https://frontendmasters.com/courses/functional-javascript/">https://frontendmasters.com/courses/functional-javascript/</a></li>
+</ul>
+</section>
+
+
+        </div>
+    </div>
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.js"></script>
+    <script>
+        // Add the nohighlight class and data-noescape attribute to code elements that have already been formatted by FSharp.Formatting
+        $('pre.highlighted code').addClass('nohighlight').attr('data-noescape', '');
+
+        // Full list of configuration options available here:
+        // https://github.com/hakimel/reveal.js#configuration
+        Reveal.initialize({
+            controls: true,
+            progress: true,
+            history: true,
+            center: true,
+
+            transition: 'slide', // default/cube/page/concave/zoom/linear/fade/none
+
+            // Parallax scrolling
+            // parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+            // parallaxBackgroundSize: '2100px 900px',
+
+            // Optional libraries used to extend on reveal.js
+            dependencies: [
+                { src: 'lib/js/classList.js', condition: function () { return !document.body.classList; } },
+                { src: 'plugin/markdown/marked.js', condition: function () { return !!document.querySelector('[data-markdown]'); } },
+                { src: 'plugin/markdown/markdown.js', condition: function () { return !!document.querySelector('[data-markdown]'); } },
+                { src: 'plugin/highlight/highlight.js', async: true, callback: function () { hljs.initHighlightingOnLoad(); } },
+                { src: 'plugin/zoom-js/zoom.js', async: true, condition: function () { return !!document.body.classList; } },
+                { src: 'plugin/notes/notes.js', async: true, condition: function () { return !!document.body.classList; } }
+            ]
+        });
+
+    </script>
+</body>
+</html>
+
